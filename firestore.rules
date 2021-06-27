@@ -1,0 +1,21 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId}/{document=**} {
+    	allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    match /links/{userId}/{document=**} {
+    	allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    match /stocks/{userId}/{document=**} {
+    	allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    match /recipes/{recipe} {
+    	allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+    }
+    match /feedback/{document=**} {
+    	allow write;
+    }
+  }
+}
