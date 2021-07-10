@@ -42,7 +42,7 @@ module.exports = function (/* ctx */) {
 
     // Full list of options: https://v1.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
     build: {
-      vueRouterMode: 'hash', // available values: 'hash', 'history'\
+      vueRouterMode: 'history', // available values: 'hash', 'history'\
       env: require('dotenv').config().parsed,
 
       // transpile: false,
@@ -115,6 +115,7 @@ module.exports = function (/* ctx */) {
       workboxOptions: {}, // only for GenerateSW
       manifest: {
         name: `DashApp`,
+        version: 0.14,
         short_name: `DashApp`,
         description: `DashApp`,
         display: 'standalone',

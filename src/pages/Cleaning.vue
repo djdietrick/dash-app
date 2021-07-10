@@ -30,11 +30,24 @@
                 <q-btn label="Save" color="green-12" class="q-mt-lg" text-color="black" @click="updateChore(editChore)"></q-btn>
             </q-card>
         </q-dialog>
+        <q-dialog v-model="history">
+            <q-card class="history__card" v-if="historyChore">
+                <div class="history__card__header">{{historyChore.title}} History</div>
+                <div class="history__card__body">
+                    <q-list class="history__card__list">
+                        <q-item v-for="(date, i) in historyChore.datesDone" :key="i" class="history__card__entry">
+                            {{formatHistoryDate(date)}}
+                            <q-btn icon="close" flat size="xs" class="history__card__entry__delete" @click="removeHistoryDate(i)"></q-btn>
+                        </q-item>
+                    </q-list>
+                </div>
+            </q-card>
+        </q-dialog>
         <q-list class="chores">
             <q-item v-for="chore in chores" :key="chore.id" class="chore q-mx-lg q-my-md q-py-lg"
                 :class="calcClass(chore)">
                 <q-item-section>
-                    <span class="chore__title">{{chore.title}}</span>
+                    <span class="chore__title text-black">{{chore.title}}</span>
                 </q-item-section>
                 <q-item-section class="chore__text__container">
                     <span class="chore__text" v-if="chore.lastDone">{{getDueText(chore)}}</span>
@@ -45,14 +58,16 @@
                     <div class="text-grey-8 q-gutter-xs">
                         <q-btn size="18px" flat dense round icon="done" @click="openDoneDialog(chore.id)"/>
                         <q-btn size="18px" flat dense round icon="more_vert">
-                            <q-menu :offset="[-10, 5]">
-                                <q-list>
-                                    <q-item clickable >
+                            <q-menu :offset="[-10, 5]" auto-close>
+                                <q-list style="min-width: 100px">
+                                    <q-item clickable @click="showHistory(chore)">
                                         <q-item-section>History</q-item-section>
                                     </q-item>
+                                    <q-separator />
                                     <q-item clickable @click="startEdit(chore)">
                                         <q-item-section>Edit</q-item-section>
                                     </q-item>
+                                    <q-separator />
                                     <q-item clickable @click="deletePrompt(chore)">
                                         <q-item-section>Delete</q-item-section>
                                     </q-item>
@@ -87,7 +102,9 @@ export default {
                 title: '',
                 frequency: ''
             },
-            edit: false
+            edit: false,
+            history: false,
+            historyChore: null
         }
     },
     methods: {
@@ -137,6 +154,11 @@ export default {
             }
         },
         async updateChore(chore) {
+            let latest = null;
+            for(let date of chore.datesDone) {
+                if(!latest || moment(latest) < moment(date)) latest = date;
+            }
+            chore.lastDone = latest;
             await db().collection('chores').doc(chore.id).set(chore);
             for(let i = 0; i < this.chores.length; i++) {
                 if(this.chores[i].id === chore.id) {
@@ -149,7 +171,7 @@ export default {
         async addDoneDate() {
             for(let i = 0; i < this.chores.length; i++) {
                 if(this.chores[i].id === this.doneId) {
-                    this.chores[i].datesDone.push(this.doneDate);
+                    //this.chores[i].datesDone.push(this.doneDate);
                     let latest = moment(this.doneDate);
                     for(let date of this.chores[i].datesDone) {
                         if(date == this.doneDate) {
@@ -158,6 +180,7 @@ export default {
                         };
                         if(moment(date) > latest) latest = moment(date);
                     }
+                    this.chores[i].datesDone.push(this.doneDate);
                     this.chores[i].lastDone = latest.format('YYYY/MM/DD');
                     await db().collection('chores').doc(this.doneId).set(this.chores[i]);
                 }
@@ -223,6 +246,22 @@ export default {
         },
         getTodaysDate() {
             return moment().format('MMMM DD, YYYY');
+        },
+        showHistory(chore) {
+            this.historyChore = chore;
+            this.sortDatesDone(this.historyChore);
+            this.history = true;
+        },
+        sortDatesDone(chore) {
+            chore.datesDone.sort((l,r) => {
+                return moment(l) < moment(r);
+            })
+        },
+        formatHistoryDate(date) {
+            return moment(date).format('M/DD/YYYY');
+        },
+        removeHistoryDate(i) {
+            this.historyChore.datesDone.splice(i,1);
         }
     },
     watch: {
@@ -232,6 +271,12 @@ export default {
                     title: '',
                     frequency: ''
                 }
+            }
+        },
+        history: async function(val) {
+            if(!val) {
+                await this.updateChore(this.historyChore);
+                this.historyChore = null;
             }
         }
     },
@@ -293,6 +338,54 @@ export default {
         transform: translateX(-50%);
         font-size: 1.3rem;
         font-weight: 300;
+    }
+}
+
+.history {
+    &__card {
+        width: 85vw;
+        height: 70vh;
+        display: grid;
+        grid-template-rows: 5rem 1fr;
+        position: relative;
+
+        &__header {
+            place-self: center;
+            font-size: 1.6rem;
+            font-weight: 300;
+        }
+
+        &__body {
+            display: flex;
+            width: 100%;
+            justify-content: center;
+            overflow-y: auto;
+        }
+
+        &__list {
+            width: 100%;
+        }
+
+        &__entry {
+            background-color: rgba($green-12, 0.7);
+            border-radius: 0.4rem;
+            display: grid;
+            place-items: center;
+            position: relative;
+            margin-left: 2rem;
+            margin-right: 2rem;
+
+            &__delete {
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                right: 8px;
+            }
+
+            &:not(:last-child) {
+                margin-bottom: 1rem;
+            }
+        }
     }
 }
 

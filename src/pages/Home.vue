@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import {mapActions} from 'vuex';
+import {mapActions, mapGetters} from 'vuex';
 export default {
     data() {
         return {
@@ -33,6 +33,11 @@ export default {
             ]
         }
     },
+    computed: {
+        ...mapGetters({
+            user: 'getUser'
+        })
+    },
     methods: {
         ...mapActions(['logout']),
         emitComponent(i) {
@@ -41,6 +46,11 @@ export default {
         async logoutUser() {
             await this.logout();
             this.$router.push('/auth');
+        }
+    },
+    created() {
+        if(this.user) {
+            //this.$q.dark.set(this.user.dark);
         }
     }
 }

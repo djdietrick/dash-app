@@ -1,4 +1,3 @@
-import { setLogFunction } from '@google-cloud/firestore';
 import Vue from 'vue'
 import Vuex from 'vuex'
 import createPersistedState from 'vuex-persistedstate';

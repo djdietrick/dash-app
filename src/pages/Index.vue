@@ -1,5 +1,5 @@
 <template>
-  <q-page class="flex flex-center">
+  <q-page class="flex flex-center" v-touch-swipe.right="handleBack">
     <transition name="fade" mode="out-in">
         <q-btn round icon="home" v-if="selectedComponent != 'home'" @click="selectedComponent = 'home'" 
           class="home__btn" color="white" text-color="black"></q-btn>
@@ -31,6 +31,9 @@ export default {
   methods: {
     handleSelect(val) {
       this.selectedComponent = val;
+    },
+    handleBack({evt, ...newInfo}) {
+      this.selectedComponent = 'home';
     }
   }
 }

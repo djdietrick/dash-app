@@ -9,7 +9,6 @@
     "test": "echo \"No test specified\" && exit 0"
   },
   "dependencies": {
-    "@google-cloud/firestore": "^4.12.3",
     "@quasar/extras": "^1.0.0",
     "core-js": "^3.6.5",
     "firebase": "^8.6.7",
@@ -20,7 +19,8 @@
   },
   "devDependencies": {
     "@quasar/app": "^2.0.0",
-    "dotenv": "^10.0.0"
+    "dotenv": "^10.0.0",
+    "workbox-webpack-plugin": "^5.1.4"
   },
   "browserslist": [
     "last 10 Chrome versions",

@@ -1,7 +1,6 @@
 import * as firebaseService from '../services/firebase.js';
 
 export default async () => {
-    // const config = process.env.environments.FIREBASE_CONFIG
     const config = {
         apiKey: process.env.API_KEY,
         authDomain: "dash-website-1b9cb.firebaseapp.com",

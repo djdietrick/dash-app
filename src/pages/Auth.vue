@@ -4,7 +4,7 @@
             <q-form @submit="submit">
                 <q-input v-model="email" label="Email"></q-input>
                 <q-input v-model="password" label="Password" type="password"></q-input>
-                <q-btn label="Login" size="lg" type="submit" class="q-mt-lg auth__btn" color="green-12"></q-btn>
+                <q-btn label="Login" size="lg" type="submit" class="q-mt-lg auth__btn" color="blue-6"></q-btn>
             </q-form>
         </q-card>
     </div>
@@ -38,6 +38,8 @@ export default {
     display: grid;
     place-items: center;
     height: 100vh;
+    width: 100vw;
+    background-color: $blue-6;
     &__card {
         width: 80vw;
         padding: 1rem;
